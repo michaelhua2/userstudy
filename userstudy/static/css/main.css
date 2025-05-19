@@ -1,0 +1,188 @@
+html, body{
+  height: 100%;
+}
+
+.main-body{
+	padding-top: 70px !important;
+	padding-bottom: 80px;
+	min-height: 100%;
+  font-size: 12pt;
+}
+
+
+.footer {
+	position: relative;
+  width: 100%;
+	/* Set the fixed height of the footer here */
+	margin-top: -80px;
+	height: 80px;
+	background-color: #CCCCCC;
+	clear: both;
+}
+
+.footer > .container {
+  padding-top: 30px;
+  text-align: center;
+}
+
+.border-red{
+	border-style: solid;
+	border-color: red;
+}
+
+
+.border-blue{
+	border-style: solid;
+	border-color: blue;
+}
+
+.col-center{
+    display: inline-block;
+    float: none;
+}
+
+.center{
+  text-align: center;
+}
+
+
+.img-caption{
+  margin-top: 5px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.img-style-caption{
+  margin-top: 5px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.text-center {
+  text-align: center;
+}
+.ref-img {
+  display: block;
+  margin: 0 auto;  // Ensures the image is centered horizontally if it doesn't naturally fill the column width
+}
+
+.img-responsive, .compare-img {
+  width: 100%;    /* Forces the image to expand to the full width of its container */
+  height: auto;   /* Maintains the aspect ratio of the image */
+  display: block; /* Removes any extra spacing below the image */
+}
+.img-content-caption{
+  margin-top: 5px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.compare-img{
+  width: 200%;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  border:5px solid white;
+}
+
+.row.no-gutters {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.row.no-gutters > [class^="col-"],
+.row.no-gutters > [class*=" col-"] {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.img-responsive {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.display-img{
+  max-height: 512px;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.voted{
+  border: 5px solid red;
+}
+.voted-text{
+  font-weight: bold;
+  color: red;
+}
+
+.progress {
+    position: relative;
+}
+
+.progress span {
+    position: absolute;
+    display: block;
+    width: 100%;
+    color: black;
+ }
+
+.teaser-row{
+}
+
+.teaser-caption{
+  background-color: white;
+  text-align: center;
+  font-size: 12pt;
+}
+
+#slideshow{ 
+  position:relative;
+}
+#slideshow .teaser{
+
+  margin-left:auto;
+  margin-right:auto;
+  position:absolute;
+  z-index:1
+}
+#slideshow .teaser.active{
+  z-index:3
+}
+
+.control-label{
+  text-align: right;
+}
+
+.done{
+  font-weight: bold;
+}
+
+.hidden {
+  display:none;
+}
+
+
+#show-reason-href:link{
+  color: white;
+  text-decoration: none;
+}
+
+#trial-hover{
+  
+}
+
+.instruction{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 10px;
+}
+
+.fixed-width{
+  table-layout: fixed;
+}
+
+.table-comment{
+  width: 200px !important;
+}

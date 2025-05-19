@@ -1,0 +1,44 @@
+{% extends "basic.html" %}
+{% load staticfiles %}
+
+
+
+{% block content %} 
+<div class="container">
+
+  <form id="comment_form" action="{%url 'main' %}" method = "post">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <br>
+        <div class="done">Done!</div> 
+        <br>
+        Thank you! <br>
+        You have successfully completed the survey and submitted your answers. <br>
+        <br>
+        Your HIT code is: <span class="done">{{code}}</span><br>
+        <br>
+        You can leave your comments or suggestions here:
+        <br>
+        <textarea class="form-control" rows="5" name="comment" value=""></textarea>
+        <br>
+
+        Once again, thank you for participating! <br>
+
+      </div>
+    </div>
+    
+    <br>
+
+    <div class="row">
+      <div class="center">
+        <input type="submit" class="btn btn-primary btn-raised" id="comment-btn" value="Submit">
+        <input type="hidden" name="user_id" value="{{user_id}}">
+      </div>
+    </div>
+
+  </form>
+
+</div>
+{% endblock content %}
+

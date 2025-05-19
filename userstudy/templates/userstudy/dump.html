@@ -1,0 +1,97 @@
+{% extends "basic.html" %}
+{% load staticfiles %}
+
+
+
+{% block content %} 
+
+<div class="container">
+
+  <div class="row">
+    # version = {{version}}
+  </div>
+  <div class="row">
+    # valid votes = {{num_valid_vote}}
+  </div>
+
+  <br>
+
+  <div class="row">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Method 1</th>
+          <th>Method 2</th>
+          <th>Method 3</th>
+          <th>Method 4</th>
+          <th>Method 5</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{method1}}</td>
+          <td>{{method2}}</td>
+          <td>{{method3}}</td>
+          <td>{{method4}}</td>
+          <td>{{method5}}</td>
+        </tr>
+      </tdoby>
+
+    </table>    
+  </div>
+
+
+  <div class="row">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Method 1v2</th>
+          <th>Method 2v3</th>
+          <th>Method 1v3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{method1v2}}</td>
+          <td>{{method2v3}}</td>
+          <td>{{method1v3}}</td>
+        </tr>
+      </tdoby>
+
+    </table>    
+  </div>
+
+  <div class="row">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>User ID</th>
+          <th>Start Time</th>
+          <th>Duration</th>
+          <th>Code</th>
+          <th>Finished Votes</th>
+          <th class="table-comment">Comments</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in user_all %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{user.id}}</td>
+            <td>{{user.st_time}}</td>
+            <td>{{user.duration}}</td>
+            <td>{{user.code}}</td>
+            <td>{{user.finish_votes}}</td>
+            <td class="table-comment">{{user.comment}}</td>
+          </tr>
+        {% endfor %}
+      </tdoby>
+
+    </table>    
+  </div>
+
+</div>
+
+{% endblock content %}
+

@@ -1,0 +1,106 @@
+{% extends "basic.html" %}
+{% load staticfiles %}
+
+
+
+{% block content %} 
+<div class="container">
+
+  <form action="{%url 'main' %}" method = "post" id="info_form">
+    {% csrf_token %}
+
+    <div class="row center">
+      <h3>User Information</h3>
+    </div>
+
+    <br>
+
+    <div class="row">
+      <div class="col-md-offset-2 col-md-8 col-sm-12 col-xs-12">
+
+        <div class="form-group">
+          <label for="gender" class="col-sm-6 control-label">Gender:</label>
+          <div class="col-sm-6">
+            <div class="btn-group">
+              <select class="form-control" id="gender-selector" name="gender" onchange="validate_info()">
+                <option value=0 selected disabled>-</option>
+                <option value=1 >Male</option>
+                <option value=2 >Female</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <br>
+
+        <div class="form-group">
+          <label for="age" class="col-sm-6 control-label">Age:</label>
+          <div class="col-sm-6">
+            <div class="btn-group">
+              <select class="form-control" id="age-selector" name="age" onchange="validate_info()">
+                <option value=0 selected disabled>-</option>
+                <option value=1 >under 10</option>
+                <option value=2 >11 ~ 20</option>
+                <option value=3 >21 ~ 30</option>
+                <option value=4 >31 ~ 40</option>
+                <option value=5 >41 ~ 50</option>
+                <option value=5 >over 50</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+          <label for="exp" class="col-sm-6 control-label">Experience in Computer Vision:</label>
+          <div class="col-sm-6">
+            <div class="btn-group">
+              <select class="form-control" id="exp-selector" name="exp" onchange="validate_info()">
+                <option value=0 selected disabled>-</option>
+                <option value=1 >No experience</option>
+                <option value=2 >Beginner</option>
+                <option value=3 >Intermediate</option>
+                <option value=4 >Advanced</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        
+      </div>
+
+    </div>
+
+
+    <br>
+    <br>
+    <div class="row">
+      <div class="center">
+        <input type="submit" class="btn btn-primary btn-raised" id="info-next-btn" disabled="disable" value="Next" onclick="show_waiting()">
+      </div>
+    </div>
+
+
+    <div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title center">
+              <span class="glyphicon glyphicon-time"></span> Please Wait
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div class="progress">
+              <div class="progress-bar progress-bar-info progress-bar-striped active" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+  </form>
+
+</div>
+{% endblock content %}
+

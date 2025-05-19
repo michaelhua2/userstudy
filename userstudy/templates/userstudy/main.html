@@ -1,0 +1,94 @@
+{% extends "basic.html" %}
+{% load staticfiles %}
+
+
+
+{% block content %}
+
+  <form id="main_form" action="{%url 'main' %}" method = "post">
+    {% csrf_token %}
+    <div class="row" margin-top="10px">
+      <div class="col-md-8 col-md-offset-2 center">
+        <p class="bg-success instruction">
+          Which of the following images appear most realistic to you? <br>
+          (Please pay attention to details!)
+          <br>
+        </p>
+      </div>
+    </div>
+
+    <div class="row no-gutters">
+
+      <div class="col-md-2 col-md-offset-2">
+          <div class="img-block" onclick="check_next(this)">
+            <img src="{% static m1_path %}" class="img-responsive compare-img" id="compare-img-1" name="Image 1" alt="Image 1">
+            <div class="img-caption" id="caption-img-1">
+              Method 1
+            </div>
+            <input type="hidden" class="img-vote" id="m1_vote" name="m1_vote" value="0">
+          </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="img-block" onclick="check_next(this)">
+          <img src="{% static m2_path %}" class="img-responsive compare-img" id="compare-img-2" name="Image 2" alt="Image 2">
+          <div class="img-caption" id="caption-img-2">
+            Method 2
+          </div>
+          <input type="hidden" class="img-vote" id="m2_vote" name="m2_vote" value="0">
+        </div>
+      </div>
+
+      <div class="col-md-2">
+          <div class="img-block" onclick="check_next(this)">
+            <img src="{% static m3_path %}" class="img-responsive compare-img" id="compare-img-3" name="Image 3" alt="Image 3">
+            <div class="img-caption" id="caption-img-3">
+              Method 3
+            </div>
+            <input type="hidden" class="img-vote" id="m3_vote" name="m3_vote" value="0">
+          </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="img-block" onclick="check_next(this)">
+          <img src="{% static m4_path %}" class="img-responsive compare-img" id="compare-img-4" name="Image 4" alt="Image 4">
+          <div class="img-caption" id="caption-img-4">
+            Method 4
+          </div>
+          <input type="hidden" class="img-vote" id="m4_vote" name="m4_vote" value="0">
+        </div>
+    </div>
+
+  </div>
+
+
+    <br>
+
+    <div class="row">
+      <div class="center">
+
+          <input type="submit" class="btn btn-primary" id="next-btn" disabled="disable" value="Next">
+
+      </div>
+    </div>
+
+    <br>
+
+    <div class="row center">
+      <div class="col-md-8 col-md-offset-2">
+        <div class="progress">
+          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: {{percentage}}%;">
+            <span>{{percentage}}% ({{current_vote_id}} / {{total_votes}})</span>
+          </div>
+        </div>
+
+
+        <input type="hidden" name="current_vote_id" value="{{current_vote_id}}">
+        <input type="hidden" name="user_id" value="{{user_id}}">
+
+      </div>
+    </div>
+
+  </form>
+
+{% endblock content %}

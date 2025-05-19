@@ -1,0 +1,86 @@
+{% extends "basic.html" %}
+{% load staticfiles %}
+
+
+
+{% block content %}
+<div class="container">
+
+  <form action="{%url 'index' %}" method = "post" id="index_form">
+    {% csrf_token %}
+
+    <div class="row teaser-row">
+      <div class="col-md-8 col-md-offset-2">
+        <h2>Introduction</h2>
+        <p>
+
+          In this survey, we would like to evalute different blending methods and determine which method produces the most realistic looking results. 
+
+          Please analyze the images closely as many artifacts are not easily noticiable.
+        </p>
+      </div>
+      <!--
+      <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+
+        <div id="crossfade">
+          <img src="{% static 'images/blur.jpg' %}" class="img-responsive" id="teaser1-img" data-cycle-title="Blurred Image" >
+          <img src="{% static 'images/deblur.jpg' %}" class="img-responsive" id="teaser2-img" data-cycle-title="Deblurred Image" >
+        </div>
+        <div id="adv-custom-caption" class="center"></div>
+      </div>
+    -->
+    </div>
+<!-- 
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+          <img src="{% static 'teser/teser.jpg' %}" class="img-responsive">
+      </div>
+    </div> -->
+
+    <br>
+
+
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <h2>Examples</h2>
+        <p>
+          We provide typical samples that we define as <font color='blue'>better</font> as follows: 
+        </p>
+	<!--    <div class="row">-->
+          <div class="col-md-8 col-md-offset-2">
+              <img src="{% static 'teser/realism_tutorial.png' %}" class="img-responsive">
+
+            </div>
+	<!-- </div>        -->
+      </div>
+    </div>
+
+
+
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <h2>What to do?</h2>
+        <p>
+          We will show you 4 images from 4 different methods. <br>
+		      You are asked to choose the <font color="red">ONE</font> that you think looks more realistic. <br>
+          You will do 12 rounds of selection and it takes about 4-5 minutes. Many thanks for your help!
+          <br><br>
+          For any comments or questions, please email to seanliu@andrew.cmu.edu
+
+        </p>
+      </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+      <div class="center">
+        <input type="submit" class="btn btn-primary btn-raised" id="start-btn" value="Start Survey">
+      </div>
+    </div>
+
+    <br>
+  </form>
+
+</div>
+{% endblock content %}
