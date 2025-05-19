@@ -14,18 +14,17 @@ VERSION = '20170728_style'
 num_methods = 2      #ours, sd, dalton, jiabin
 
 # Create your views here.
-def index(request):
-
-    if( request.method == "POST" ):
-        return redirect('consent')
-
-    return render(request, 'userstudy/index.html')
 
 
 index_to_method = {1: 'ours', 2: 'unguided', 3: 'dalton', 4: 'jiabin'}
 
 def consent(request):
     if request.method == "POST":
+        return redirect('index')
+    return render(request, 'userstudy/consent.html')
+
+def index(request):
+    if( request.method == "POST" ):
         return redirect('info')
     return render(request, 'userstudy/consent.html')
 
