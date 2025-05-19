@@ -102,24 +102,15 @@ def main(request):
         #style_path = 'data/style/%d.png' %vote.style
         #content_path = 'data/content/%d.png' %vote.content
 
-        ref_path = 'data/%d/%d.jpg' %(0,vote.sceneId)
         if is_colorblind:
-            m1_path = f'data/{vote.method1}/rgb/{vote.sceneId}.png' 
-            m2_path = f'data/{vote.method2}/rgb/{vote.sceneId}.png'
+            subfolder = 'rgb'
         else:
-            m1_path = f'data/{vote.method1}/cvd/{vote.sceneId}.png' 
-            m2_path = f'data/{vote.method2}/cvd/{vote.sceneId}.png'
+            subfolder = 'cvd'
         
-        # m3_path = 'data/%d/%d.jpg' %(vote.method3,vote.sceneId)
-        # m4_path = 'data/%d/%d.jpg' %(vote.method4,vote.sceneId)
-        # m5_path = 'data/%d/%d.jpg' %(vote.method5,vote.sceneId)
-        # m6_path = 'data/%d/%d.jpg' %(vote.method6,vote.sceneId)
-        # m7_path = 'data/%d/%d.jpg' %(vote.method7,vote.sceneId)
-        # m8_path = 'data/%d/%d.jpg' %(vote.method8,vote.sceneId)
-        #m3_path = 'data/result/%d_%d_m%d.png' %(vote.content, vote.style, vote.method3)
-        #m4_path = 'data/result/%d_%d_m%d.png' %(vote.content, vote.style, vote.method4)
-        #m5_path = 'data/result/%d_%d_m%d.png' %(vote.content, vote.style, vote.method5)
-
+        m1_path = f'data/{vote.method1}/{subfolder}/{vote.sceneId}.png' 
+        m2_path = f'data/{vote.method2}/{subfolder}/{vote.sceneId}.png'
+        # m3_path = f'data/{vote.method3}/{subfolder}/{vote.sceneId}.png'
+        # m4_path = f'data/{vote.method4}/{subfolder}/{vote.sceneId}.png'
 
         # record vote-starting time
         vote.st_time = timezone.now()
@@ -130,7 +121,7 @@ def main(request):
 
         context = {'current_vote_id': current_vote_id, 'total_votes': total_votes, \
                    'percentage': percentage, 'user_id': user.id, \
-                   'm1_path': m1_path, 'm2_path': m2_path, 'ref_path': ref_path,
+                   'm1_path': m1_path, 'm2_path': m2_path,
                 #    'm3_path': m3_path, 'm4_path': m4_path,
                 #    'm5_path': m5_path, 'm6_path': m6_path,
                 #    'm7_path': m7_path, 'm8_path': m8_path,
@@ -232,7 +223,6 @@ def main(request):
             #style_path = 'data/style/%d.png' %vote.style
             #content_path = 'data/content/%d.png' %vote.content
 
-            ref_path = 'data/%d/%d.jpg' %(0,vote.sceneId)
             if is_colorblind:
                 m1_path = f'data/{vote.method1}/rgb/{vote.sceneId}.png' 
                 m2_path = f'data/{vote.method2}/rgb/{vote.sceneId}.png'
@@ -262,7 +252,6 @@ def main(request):
                        'm1_path': m1_path, 'm2_path': m2_path, 
                     #    'm3_path': m3_path,
                     #    'm4_path': m4_path,
-                       'ref_path': ref_path,
                     #    'm5_path': m5_path, 'm6_path': m6_path,
                     #     'm7_path': m7_path, 'm8_path': m8_path,
                         }
@@ -275,7 +264,7 @@ def finish(request):
 
 def info(request):
     if request.method == 'POST':
-        colorblind = request.POST.get('gender')  # assuming 'gender' field stores that answer
+        colorblind = request.POST.get('colorblind')
         request.session['is_colorblind'] = (colorblind == '1')
         request
         return redirect('main')
