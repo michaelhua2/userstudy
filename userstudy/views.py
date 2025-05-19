@@ -31,7 +31,7 @@ def main(request):
     base_method = 1
     compare_methods = [2, 3, 4]
     total_votes = num_scenes * len(compare_methods)
-    prompts = json.load(open('userstudy/static/data/prompts.json', 'r'))
+    prompts = json.load(open('userstudy/static/prompts.json', 'r'))
 
     is_colorblind = request.session.get('is_colorblind', False)
 
