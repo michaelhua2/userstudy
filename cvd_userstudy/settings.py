@@ -49,9 +49,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'deblur_benchmark_userstudy.urls'
+ROOT_URLCONF = 'cvd_userstudy.urls'
 
-WSGI_APPLICATION = 'deblur_benchmark_userstudy.wsgi.application'
+WSGI_APPLICATION = 'cvd_userstudy.wsgi.application'
 
 
 # Database

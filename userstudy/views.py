@@ -22,7 +22,7 @@ def index(request):
     return render(request, 'userstudy/index.html')
 
 
-index_to_method = {0: 'ref', 1: 'ours', 2: 'photomontage-full', 4: 'masactrl', 5: 'bld'}
+index_to_method = {0: 'ref', 1: 'ours', 2: 'photomontage-full'}
 
 def main(request):
 
@@ -68,12 +68,14 @@ def main(request):
             #vote.content    = selected_content_idxs[c]
 
             ## random method, we only show the first two method
-            method_order    = [1, 2, 4, 5]  # TODO: change this to reflect the subdir index name
+            method_order    = [1, 2, 
+                            #    4, 5
+                               ]  # TODO: change this to reflect the subdir index name
             random.shuffle(method_order)
             vote.method1    = method_order[0]
             vote.method2    = method_order[1]
-            vote.method3    = method_order[2]
-            vote.method4    = method_order[3]
+            # vote.method3    = method_order[2]
+            # vote.method4    = method_order[3]
             #vote.method5    = method_order[4]
             # pdb.set_trace()
             vote.save()
@@ -99,10 +101,10 @@ def main(request):
         #content_path = 'data/content/%d.png' %vote.content
 
         ref_path = 'data/%d/%d.jpg' %(0,vote.sceneId)
-        m1_path = 'data/%d/%d.jpg' %(vote.method1,vote.sceneId)
-        m2_path = 'data/%d/%d.jpg' %(vote.method2,vote.sceneId)
-        m3_path = 'data/%d/%d.jpg' %(vote.method3,vote.sceneId)
-        m4_path = 'data/%d/%d.jpg' %(vote.method4,vote.sceneId)
+        m1_path = 'data/%d/%d.png' %(vote.method1,vote.sceneId)
+        m2_path = 'data/%d/%d.png' %(vote.method2,vote.sceneId)
+        # m3_path = 'data/%d/%d.jpg' %(vote.method3,vote.sceneId)
+        # m4_path = 'data/%d/%d.jpg' %(vote.method4,vote.sceneId)
         # m5_path = 'data/%d/%d.jpg' %(vote.method5,vote.sceneId)
         # m6_path = 'data/%d/%d.jpg' %(vote.method6,vote.sceneId)
         # m7_path = 'data/%d/%d.jpg' %(vote.method7,vote.sceneId)
@@ -122,7 +124,7 @@ def main(request):
         context = {'current_vote_id': current_vote_id, 'total_votes': total_votes, \
                    'percentage': percentage, 'user_id': user.id, \
                    'm1_path': m1_path, 'm2_path': m2_path, 'ref_path': ref_path,
-                   'm3_path': m3_path, 'm4_path': m4_path,
+                #    'm3_path': m3_path, 'm4_path': m4_path,
                 #    'm5_path': m5_path, 'm6_path': m6_path,
                 #    'm7_path': m7_path, 'm8_path': m8_path,
                    }
@@ -162,8 +164,8 @@ def main(request):
             ## extract vote results
             m1_vote = int(request.POST["m1_vote"])
             m2_vote = int(request.POST["m2_vote"])
-            m3_vote = int(request.POST["m3_vote"])
-            m4_vote = int(request.POST["m4_vote"])
+            # m3_vote = int(request.POST["m3_vote"])
+            # m4_vote = int(request.POST["m4_vote"])
             # m5_vote = int(request.POST["m5_vote"])
             # m6_vote = int(request.POST["m6_vote"])
             # m7_vote = int(request.POST["m7_vote"])
@@ -177,12 +179,12 @@ def main(request):
             elif( m2_vote == 1 ):
                 vote.result = 2
                 method = vote.method2
-            elif( m3_vote == 1 ):
-                vote.result = 3
-                method = vote.method3
-            elif( m4_vote == 1 ):
-                vote.result = 4
-                method = vote.method4
+            # elif( m3_vote == 1 ):
+            #     vote.result = 3
+            #     method = vote.method3
+            # elif( m4_vote == 1 ):
+            #     vote.result = 4
+            #     method = vote.method4
             # elif( m5_vote == 1 ):
             #     vote.result = 3
             #     method = vote.method5
@@ -224,10 +226,10 @@ def main(request):
             #content_path = 'data/content/%d.png' %vote.content
 
             ref_path = 'data/%d/%d.jpg' %(0,vote.sceneId)
-            m1_path = 'data/%d/%d.jpg' %(vote.method1,vote.sceneId)
-            m2_path = 'data/%d/%d.jpg' %(vote.method2,vote.sceneId)
-            m3_path = 'data/%d/%d.jpg' %(vote.method3,vote.sceneId)
-            m4_path = 'data/%d/%d.jpg' %(vote.method4,vote.sceneId)
+            m1_path = 'data/%d/%d.png' %(vote.method1,vote.sceneId)
+            m2_path = 'data/%d/%d.png' %(vote.method2,vote.sceneId)
+            # m3_path = 'data/%d/%d.jpg' %(vote.method3,vote.sceneId)
+            # m4_path = 'data/%d/%d.jpg' %(vote.method4,vote.sceneId)
             # m5_path = 'data/%d/%d.jpg' %(vote.method5,vote.sceneId)
             # m6_path = 'data/%d/%d.jpg' %(vote.method6,vote.sceneId)
             # m7_path = 'data/%d/%d.jpg' %(vote.method7,vote.sceneId)
@@ -247,8 +249,8 @@ def main(request):
             context = {'current_vote_id': current_vote_id, 'total_votes': total_votes, \
                        'percentage': percentage, 'user_id': user.id, \
                        'm1_path': m1_path, 'm2_path': m2_path, 
-                       'm3_path': m3_path,
-                       'm4_path': m4_path,
+                    #    'm3_path': m3_path,
+                    #    'm4_path': m4_path,
                        'ref_path': ref_path,
                     #    'm5_path': m5_path, 'm6_path': m6_path,
                     #     'm7_path': m7_path, 'm8_path': m8_path,
@@ -299,9 +301,14 @@ def dump(request):
             if( vote.ed_time != None ):
                 diff = vote.ed_time - vote.st_time
                 vote.duration = diff.seconds
-                vote_data.append([user.id, vote.sceneId, vote.method1, vote.method2, vote.method3, vote.method4, vote.result, vote.duration])
+                vote_data.append([user.id, vote.sceneId, 
+                                #   vote.method1, vote.method2, 
+                                #   vote.method3, vote.method4, 
+                                  vote.result, vote.duration])
 
-                order = [vote.method1, vote.method2, vote.method3, vote.method4]
+                order = [vote.method1, vote.method2, 
+                        #  vote.method3, vote.method4
+                         ]
                 selected_method = order[ vote.result - 1 ] - 1
                 print(order, selected_method, vote.result)
                 count[ selected_method ] = count[ selected_method ] + 1
