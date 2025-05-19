@@ -1,0 +1,96 @@
+{% extends "basic.html" %}
+{% load staticfiles %}
+
+
+
+{% block content %} 
+<div class="container">
+
+  <form action="" method="post" id="info_form">
+    {% csrf_token %}
+
+    <div class="row center">
+      <h3>Consent</h3>
+    </div>
+
+    <div class="row">
+      <div class="col-md-offset-2 col-md-8 col-sm-12 col-xs-12">
+
+        <div class="row text-center" style="margin-bottom: 20px;">
+          <embed src="{% static 'consent_form.pdf' %}" type="application/pdf" width="100%" height="600px" />
+        </div>
+
+        <div class="form-group row align-items-center">
+          <label for="above18" class="col-sm-6 control-label">I am age 18 or older.</label>
+          <div class="col-sm-6">
+            <div class="btn-group">
+              <select class="form-control" id="above18" name="above18" onchange="validate_consent()">
+                <option value=0 selected disabled>-</option>
+                <option value=1 >Yes</option>
+                <option value=2 >No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row align-items-center">
+          <label for="understand" class="col-sm-6 control-label">I have read and understood the information above.</label>
+          <div class="col-sm-6">
+            <div class="btn-group">
+              <select class="form-control" id="understand" name="understand" onchange="validate_consent()">
+                <option value=0 selected disabled>-</option>
+                <option value=1 >Yes</option>
+                <option value=2 >No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group align-items-center">
+          <label for="participate" class="col-sm-6 control-label">I want to participate in this research and continue with the study.</label>
+          <div class="col-sm-6">
+            <div class="btn-group">
+              <select class="form-control" id="participate" name="participate" onchange="validate_consent()">
+                <option value=0 selected disabled>-</option>
+                <option value=1 >Yes</option>
+                <option value=2 >No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <br>
+        
+      </div>
+
+    </div>
+
+    <br>
+    <div class="row">
+      <div class="center">
+        <input type="submit" class="btn btn-primary btn-raised" id="consent-next-btn" disabled="disable" value="Next" onclick="show_waiting()">
+      </div>
+    </div>
+
+
+    <div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title center">
+              <span class="glyphicon glyphicon-time"></span> Please Wait
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div class="progress">
+              <div class="progress-bar progress-bar-info progress-bar-striped active" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+  </form>
+
+</div>
+{% endblock content %}

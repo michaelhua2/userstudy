@@ -17,12 +17,24 @@ num_methods = 2      #ours, sd, dalton, jiabin
 def index(request):
 
     if( request.method == "POST" ):
-        return redirect('info')
+        return redirect('consent')
 
     return render(request, 'userstudy/index.html')
 
 
 index_to_method = {1: 'ours', 2: 'unguided', 3: 'dalton', 4: 'jiabin'}
+
+def consent(request):
+    if request.method == "POST":
+        return redirect('info')
+    return render(request, 'userstudy/consent.html')
+
+def info(request):
+    if request.method == 'POST':
+        colorblind = request.POST.get('colorblind')
+        request.session['is_colorblind'] = (colorblind == '1')
+        return redirect('main')
+    return render(request, 'userstudy/info.html')
 
 def main(request):
 
@@ -163,14 +175,6 @@ def main(request):
 
 def finish(request):
     return render(request, 'userstudy/finish.html')
-
-def info(request):
-    if request.method == 'POST':
-        colorblind = request.POST.get('colorblind')
-        request.session['is_colorblind'] = (colorblind == '1')
-        request
-        return redirect('main')
-    return render(request, 'userstudy/info.html')
 
 def dump(request):
     user_all = People.objects.all().exclude(ed_time=None)

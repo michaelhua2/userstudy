@@ -119,7 +119,18 @@ function validate_info() {
     
     if (colorblind !== null) {
         $('#info-next-btn').removeAttr('disabled');
-    } else {
-        $('#info-next-btn').attr('disabled', 'disabled');
+    }
+}
+
+function validate_consent() {    
+    var above18  = $("#above18").val();
+    var understand = $("#understand").val();
+    var participate = $("#participate").val();
+    
+    if (above18 == 1 && understand == 1 && participate == 1) {
+        $('#consent-next-btn').removeAttr('disabled');
+    }
+    else {
+        $('#consent-next-btn').attr('disabled', 'disabled');
     }
 }
