@@ -11,7 +11,7 @@ from django import template
 import pdb
 
 VERSION = '20170728_style'
-num_methods = 8      #gt, ours, baseline
+num_methods = 2      #gt, ours, baseline
 
 # Create your views here.
 def index(request):
@@ -40,7 +40,7 @@ def main(request):
 
     is_colorblind = request.session.get('is_colorblind', False)
 
-    if( request.method != "POST" ):
+    if( request.method != "POST" or "user_id" not in request.POST):
 
         #### first visiting, create user
         user = People()
@@ -277,6 +277,7 @@ def info(request):
     if request.method == 'POST':
         colorblind = request.POST.get('gender')  # assuming 'gender' field stores that answer
         request.session['is_colorblind'] = (colorblind == '1')
+        request
         return redirect('main')
     return render(request, 'userstudy/info.html')
 
@@ -318,7 +319,7 @@ def dump(request):
                 diff = vote.ed_time - vote.st_time
                 vote.duration = diff.seconds
                 vote_data.append([user.id, vote.sceneId, 
-                                #   vote.method1, vote.method2, 
+                                  vote.method1, vote.method2, 
                                 #   vote.method3, vote.method4, 
                                   vote.result, vote.duration])
 
