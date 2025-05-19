@@ -1,8 +1,6 @@
 {% extends "basic.html" %}
 {% load staticfiles %}
 
-
-
 {% block content %} 
 
 <div class="container">
@@ -20,34 +18,36 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>Method 1</th>
-          <th>Method 2</th>
+          <th>{{Method_1}}</th>
+          <th>{{Method_2}}</th>
+          <th>{{Method_3}}</th>
+          <th>{{Method_4}}</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>{{method1}}</td>
           <td>{{method2}}</td>
+          <td>{{method3}}</td>
+          <td>{{method4}}</td>
         </tr>
-      </tdoby>
-
+      </tbody>
     </table>    
   </div>
-
 
   <div class="row">
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>Method 1v2</th>
+          <th>Comparison</th>
+          <th>Win Counts (A vs B)</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>{{method1v2}}</td>
-        </tr>
-      </tdoby>
-
+        <tr><td>{{Method_1}} vs {{Method_2}}</td><td>{{method1v2}}</td></tr>
+        <tr><td>{{Method_1}} vs {{Method_3}}</td><td>{{method1v3}}</td></tr>
+        <tr><td>{{Method_1}} vs {{Method_4}}</td><td>{{method1v4}}</td></tr>
+      </tbody>
     </table>    
   </div>
 
@@ -78,12 +78,10 @@
             <td class="table-comment">{{user.comment}}</td>
           </tr>
         {% endfor %}
-      </tdoby>
-
+      </tbody>
     </table>    
   </div>
 
 </div>
 
 {% endblock content %}
-

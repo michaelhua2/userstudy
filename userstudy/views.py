@@ -8,10 +8,10 @@ import random
 from hashids import Hashids
 from userstudy.utils import CommaString_to_IntArray, IntArray_to_CommaString, choose_imgs, save_csv, load_csv
 from django import template
-import pdb
+import pdb, json
 
 VERSION = '20170728_style'
-num_methods = 2      #gt, ours, baseline
+num_methods = 2      #ours, sd, dalton, jiabin
 
 # Create your views here.
 def index(request):
@@ -22,242 +22,144 @@ def index(request):
     return render(request, 'userstudy/index.html')
 
 
-index_to_method = {0: 'ref', 1: 'ours', 2: 'photomontage-full'}
+index_to_method = {1: 'ours', 2: 'unguided', 3: 'dalton', 4: 'jiabin'}
 
 def main(request):
 
-
-    ########## config variables ##########
-    num_scenes              = 1
-    #num_styles              = 48
-
-    #num_selected_styles     = 1
-    #num_selected_contents   = 1
-    ######################################
-
-    #total_votes = num_selected_styles * num_selected_contents
-    total_votes = 1  # TODO: change this to number of image pairs
+    ########## config ##########
+    num_scenes = 50
+    base_method = 1
+    compare_methods = [2, 3, 4]
+    total_votes = num_scenes * len(compare_methods)
+    prompts = json.load(open('userstudy/static/data/prompts.json', 'r'))
 
     is_colorblind = request.session.get('is_colorblind', False)
 
-    if( request.method != "POST" or "user_id" not in request.POST):
-
-        #### first visiting, create user
+    # First-time visitor: create user and generate votes
+    if request.method != "POST" or "user_id" not in request.POST:
         user = People()
         user.st_time = timezone.now()
         user.is_colorblind = is_colorblind
         user.save()
 
-        ## create Hash code
+        from hashids import Hashids
         code_generator = Hashids(min_length=10)
         user.code = code_generator.encode(user.id)
         user.save()
 
-
-        #### create votes
-        ## select styles
-        # selected_scene_idxs = np.random.permutation(num_scenes)[:num_scenes] #+ 1
-        selected_scene_idxs = np.arange(num_scenes)[:num_scenes] #+ 1
-        print(selected_scene_idxs)
-
         vote_list = []
+        for scene_id in range(num_scenes):
+            for m2 in compare_methods:
+                vote = Vote()
+                vote.user = user
+                vote.sceneId = scene_id
+                vote.method1 = base_method
+                vote.method2 = m2
+                vote.order = 0
+                vote.swap_display = random.choice([True, False])
+                vote.save()
+                vote_list.append(vote.id)
 
-        for s in range(len(selected_scene_idxs)):
-            vote            = Vote()
-            vote.user       = user
-            vote.order      = 0
-            vote.sceneId    = selected_scene_idxs[s]
-            #vote.content    = selected_content_idxs[c]
-
-            ## random method, we only show the first two method
-            method_order    = [1, 2, 
-                            #    4, 5
-                               ]  # TODO: change this to reflect the subdir index name
-            random.shuffle(method_order)
-            vote.method1    = method_order[0]
-            vote.method2    = method_order[1]
-            # vote.method3    = method_order[2]
-            # vote.method4    = method_order[3]
-            #vote.method5    = method_order[4]
-            # pdb.set_trace()
-            vote.save()
-
-            vote_list.append(vote.id)
-
-
-        ## random shuffle vote order
         random.shuffle(vote_list)
-
-        ## bound votes with user
         user.save_vote_list(vote_list)
 
-
-        #### extract vote
         current_vote_id = 0
-
-        ## extract vote from database
         vote = user.get_vote(current_vote_id)
+        subdir = 'rgb' if is_colorblind else 'cvd'
 
-        ## image paths
-        #style_path = 'data/style/%d.png' %vote.style
-        #content_path = 'data/content/%d.png' %vote.content
-
-        if is_colorblind:
-            subfolder = 'rgb'
+        if vote.swap_display:
+            left_method, right_method = vote.method2, vote.method1
+            left_is_method1 = False
         else:
-            subfolder = 'cvd'
-        
-        m1_path = f'data/{vote.method1}/{subfolder}/{vote.sceneId}.png' 
-        m2_path = f'data/{vote.method2}/{subfolder}/{vote.sceneId}.png'
-        # m3_path = f'data/{vote.method3}/{subfolder}/{vote.sceneId}.png'
-        # m4_path = f'data/{vote.method4}/{subfolder}/{vote.sceneId}.png'
+            left_method, right_method = vote.method1, vote.method2
+            left_is_method1 = True
 
-        # record vote-starting time
+        context = {
+            'current_vote_id': current_vote_id,
+            'total_votes': total_votes,
+            'percentage': 0,
+            'user_id': user.id,
+            'm1_path': f'data/{left_method}/{subdir}/{vote.sceneId}_0_.png',
+            'm2_path': f'data/{right_method}/{subdir}/{vote.sceneId}_0_.png',
+            'left_is_method1': left_is_method1,
+            'prompt': prompts[vote.sceneId],
+        }
+
         vote.st_time = timezone.now()
         vote.save()
-
-        ## progress
-        percentage = int(current_vote_id * 100.0 / total_votes)
-
-        context = {'current_vote_id': current_vote_id, 'total_votes': total_votes, \
-                   'percentage': percentage, 'user_id': user.id, \
-                   'm1_path': m1_path, 'm2_path': m2_path,
-                #    'm3_path': m3_path, 'm4_path': m4_path,
-                #    'm5_path': m5_path, 'm6_path': m6_path,
-                #    'm7_path': m7_path, 'm8_path': m8_path,
-                   }
-
         return render(request, 'userstudy/main.html', context)
 
+    # POST with comment at end of survey
+    elif "comment" in request.POST:
+        user_id = int(request.POST["user_id"])
+        user = People.objects.get(id=user_id)
+        user.comment = request.POST["comment"]
+        user.save()
+        return redirect('index')
+
+    # Voting step
     else:
+        user_id = int(request.POST["user_id"])
+        user = People.objects.get(id=user_id)
+        current_vote_id = int(request.POST["current_vote_id"])
+        vote = user.get_vote(current_vote_id)
 
-        if( "comment" in request.POST ):
-            # end of comment page, save comment and close survey
+        vote.ed_time = timezone.now()
 
-            user_id = int(request.POST["user_id"])
-            user = People.objects.get(id = user_id)
+        m1_vote = int(request.POST.get("m1_vote", 0))
+        m2_vote = int(request.POST.get("m2_vote", 0))
 
-            user.comment = request.POST["comment"]
-            user.save()
+        left_is_method1 = request.POST.get("left_is_method1") == "1"
+        m1_vote = int(request.POST.get("m1_vote", 0))
+        m2_vote = int(request.POST.get("m2_vote", 0))
 
-            # redirect to home page
-            return redirect('index')
-
-
+        if m1_vote == 1 and left_is_method1:
+            vote.result = 1
+        elif m2_vote == 1 and not left_is_method1:
+            vote.result = 1
+        elif m1_vote == 1 and not left_is_method1:
+            vote.result = 2
+        elif m2_vote == 1 and left_is_method1:
+            vote.result = 2
         else:
-            #### during survey, save current vote and extract next vote
+            return HttpResponse("No vote selected", status=400)
 
-            #### save current vote
-            ## extract user
-            user_id = int(request.POST["user_id"])
-            user = People.objects.get(id = user_id)
+        vote.order = current_vote_id + 1
+        vote.save()
 
-            ## extract current vote
-            current_vote_id = int(request.POST["current_vote_id"])
-            vote = user.get_vote(current_vote_id)
+        current_vote_id += 1
+        if current_vote_id == total_votes:
+            user.ed_time = timezone.now()
+            user.save()
+            return render(request, 'userstudy/comment.html', {
+                'user_id': user.id,
+                'code': user.code
+            })
 
-            ## record vote-starting time
-            vote.ed_time = timezone.now()
+        vote = user.get_vote(current_vote_id)
+        subdir = 'rgb' if is_colorblind else 'cvd'
 
-            ## extract vote results
-            m1_vote = int(request.POST["m1_vote"])
-            m2_vote = int(request.POST["m2_vote"])
-            # m3_vote = int(request.POST["m3_vote"])
-            # m4_vote = int(request.POST["m4_vote"])
-            # m5_vote = int(request.POST["m5_vote"])
-            # m6_vote = int(request.POST["m6_vote"])
-            # m7_vote = int(request.POST["m7_vote"])
-            # m8_vote = int(request.POST["m8_vote"])
-            #m5_vote = int(request.POST["m5_vote"])
+        if vote.swap_display:
+            left_method, right_method = vote.method2, vote.method1
+            left_is_method1 = False
+        else:
+            left_method, right_method = vote.method1, vote.method2
+            left_is_method1 = True
 
-            ## save vote result
-            if( m1_vote == 1 ):
-                vote.result = 1
-                method = vote.method1
-            elif( m2_vote == 1 ):
-                vote.result = 2
-                method = vote.method2
-            # elif( m3_vote == 1 ):
-            #     vote.result = 3
-            #     method = vote.method3
-            # elif( m4_vote == 1 ):
-            #     vote.result = 4
-            #     method = vote.method4
-            # elif( m5_vote == 1 ):
-            #     vote.result = 3
-            #     method = vote.method5
-            # elif( m6_vote == 1 ):
-            #     vote.result = 3
-            #     method = vote.method6
-            # elif( m7_vote == 1 ):
-            #     vote.result = 3
-            #     method = vote.method7
-            # elif( m8_vote == 1 ):
-            #     vote.result = 3
-            #     method = vote.method8
+        context = {
+            'current_vote_id': current_vote_id,
+            'total_votes': total_votes,
+            'percentage': 0,
+            'user_id': user.id,
+            'm1_path': f'data/{left_method}/{subdir}/{vote.sceneId}_0_.png',
+            'm2_path': f'data/{right_method}/{subdir}/{vote.sceneId}_0_.png',
+            'left_is_method1': left_is_method1,
+            'prompt': prompts[vote.sceneId],
+        }
 
-            print("User select vote %d (method %d)" %(vote.result, method))
-
-            vote.order = current_vote_id + 1
-            vote.save()
-
-
-            #### move to next vote
-            current_vote_id += 1
-
-            ## finish voting, redirect to comment page
-            if( current_vote_id == total_votes ):
-
-                user.ed_time = timezone.now()
-                user.save()
-                code = user.code
-
-                context = {'user_id': user.id, 'code': code}
-                return render(request, 'userstudy/comment.html', context)
-
-
-            #### extract next vote
-            vote = user.get_vote(current_vote_id)
-
-            ## image paths
-            #style_path = 'data/style/%d.png' %vote.style
-            #content_path = 'data/content/%d.png' %vote.content
-
-            if is_colorblind:
-                m1_path = f'data/{vote.method1}/rgb/{vote.sceneId}.png' 
-                m2_path = f'data/{vote.method2}/rgb/{vote.sceneId}.png'
-            else:
-                m1_path = f'data/{vote.method1}/cvd/{vote.sceneId}.png' 
-                m2_path = f'data/{vote.method2}/cvd/{vote.sceneId}.png'
-            # m3_path = 'data/%d/%d.jpg' %(vote.method3,vote.sceneId)
-            # m4_path = 'data/%d/%d.jpg' %(vote.method4,vote.sceneId)
-            # m5_path = 'data/%d/%d.jpg' %(vote.method5,vote.sceneId)
-            # m6_path = 'data/%d/%d.jpg' %(vote.method6,vote.sceneId)
-            # m7_path = 'data/%d/%d.jpg' %(vote.method7,vote.sceneId)
-            # m8_path = 'data/%d/%d.jpg' %(vote.method8,vote.sceneId)
-            # 'data/result/%d_%d_m%d.png' %(vote.content, vote.style, vote.method3)
-            #m4_path = 'data/result/%d_%d_m%d.png' %(vote.content, vote.style, vote.method4)
-            #m5_path = 'data/result/%d_%d_m%d.png' %(vote.content, vote.style, vote.method5)
-
-
-            # record vote-starting time
-            vote.st_time = timezone.now()
-            vote.save()
-
-            ## progress
-            percentage = int(current_vote_id * 100.0 / total_votes)
-
-            context = {'current_vote_id': current_vote_id, 'total_votes': total_votes, \
-                       'percentage': percentage, 'user_id': user.id, \
-                       'm1_path': m1_path, 'm2_path': m2_path, 
-                    #    'm3_path': m3_path,
-                    #    'm4_path': m4_path,
-                    #    'm5_path': m5_path, 'm6_path': m6_path,
-                    #     'm7_path': m7_path, 'm8_path': m8_path,
-                        }
-
-            return render(request, 'userstudy/main.html', context)
-
+        vote.st_time = timezone.now()
+        vote.save()
+        return render(request, 'userstudy/main.html', context)
 
 def finish(request):
     return render(request, 'userstudy/finish.html')
@@ -271,82 +173,71 @@ def info(request):
     return render(request, 'userstudy/info.html')
 
 def dump(request):
+    user_all = People.objects.all().exclude(ed_time=None)
 
-    user_all = People.objects.all().exclude(ed_time = None)
-
-    user_header = ["User ID", "Colorblind", "Time", "Code", "Finished Votes"]
+    user_header = ["User ID", "Time", "Code", "Finished Votes"]
     user_data = []
 
-    vote_header = ["User ID", "SceneId", "Method 1", "Method 2", 
-                #    "Method 3", "Method 4", 
-                   "Result", "Time"]
+    vote_header = ["User ID", "SceneId", "Method 1", "Method 2", "Result", "Time"]
     vote_data = []
 
-    ## aggregate vote for each method
-    count = [0 for _ in range(num_methods)]
-    binary_count = [[[0, 0] for _ in range(num_methods)] for _ in range(num_methods)]
+    num_methods = 4
+    count = [0 for _ in range(num_methods)]  # per-method win counts
+    binary_count = [[[0, 0] for _ in range(num_methods)] for _ in range(num_methods)]  # [win_count, total]
 
     for user in user_all:
-        if( user.ed_time != None ):
-            user.duration = user.ed_time - user.st_time
-        else:
-            user.duration = "Not Finish"
-
-
-        # check numbers of finished votes
-        votes = Vote.objects.filter(user = user).exclude(result = 0)
+        user.duration = (user.ed_time - user.st_time) if user.ed_time else "Not Finish"
+        votes = Vote.objects.filter(user=user).exclude(result=0)
         user.finish_votes = len(votes)
+        user_data.append([user.id, user.duration, user.code, user.finish_votes])
 
-        user_data.append([user.id, user.is_colorblind, user.duration, user.code, user.finish_votes])
+        for vote in Vote.objects.filter(user=user):
+            vote_duration = (vote.ed_time - vote.st_time).seconds if vote.ed_time else 0
+            vote_data.append([user.id, vote.sceneId, vote.method1, vote.method2, vote.result, vote_duration])
 
+            m1 = vote.method1
+            m2 = vote.method2
 
-        # extract valid votes
-        votes = Vote.objects.filter(user = user)
-        for vote in votes:
-            vote.duration = 0
-            if( vote.ed_time != None ):
-                diff = vote.ed_time - vote.st_time
-                vote.duration = diff.seconds
-                vote_data.append([user.id, vote.sceneId, 
-                                  vote.method1, vote.method2, 
-                                #   vote.method3, vote.method4, 
-                                  vote.result, vote.duration])
+            if vote.result == 1:
+                winner, loser = m1, m2
+            elif vote.result == 2:
+                winner, loser = m2, m1
+            else:
+                continue  # skip invalid vote
 
-                order = [vote.method1, vote.method2, 
-                        #  vote.method3, vote.method4
-                         ]
-                selected_method = order[ vote.result - 1 ] - 1
-                print(order, selected_method, vote.result)
-                count[ selected_method ] = count[ selected_method ] + 1
+            # win count
+            count[winner - 1] += 1
 
-                binary_count[ order[0]-1 ][ order[1]-1 ][1] += 1 # total
-                binary_count[ order[1]-1 ][ order[0]-1 ][1] += 1 # total
-                # winner + 1
-                if( vote.result == 1 ): 
-                    binary_count[ order[0]-1 ][ order[1]-1 ][0] += 1
-                    # binary_count[ order[1]-1 ][ order[0]-1 ][0] += 1
-                else:
-                    binary_count[ order[1]-1 ][ order[0]-1 ][0] += 1
+            # total comparisons
+            binary_count[m1 - 1][m2 - 1][1] += 1
+            binary_count[m2 - 1][m1 - 1][1] += 1
 
+            # winner wins over loser
+            binary_count[winner - 1][loser - 1][0] += 1
 
-    print(binary_count)
-
-    output_filename = 'user.csv'
-    save_csv(output_filename, user_header, user_data)
-
-    output_filename = 'vote.csv'
-    save_csv(output_filename, vote_header, vote_data)
-
+    # CSV output
+    save_csv('user.csv', user_header, user_data)
+    save_csv('vote.csv', vote_header, vote_data)
     num_valid_vote = len(vote_data)
 
-    context = {"user_all": user_all, 'num_valid_vote': num_valid_vote, 'version': VERSION, }
-            #    'method1': count[0], 'method2': count[1], 'method3': count[2]}
+    context = {
+        "user_all": user_all,
+        "num_valid_vote": num_valid_vote,
+        "version": VERSION,
+    }
+
+    for k, v in index_to_method.items():
+        context[f'Method_{k}'] = v
+
+    # Per-method win totals
     for i in range(num_methods):
-        context['method%d' % (i+1)] = count[i]
-    
+        context[f'method{i + 1}'] = count[i]
+
+    # Pairwise wins
     for i in range(num_methods):
-        for j in range(i+1,num_methods):
-                print((binary_count[i][j], binary_count[j][i]))
-                context['method%dv%d' % (i+1, j+1)] = '%d %d' % (binary_count[i][j][0], binary_count[j][i][0])
-                print(context)
+        for j in range(i + 1, num_methods):
+            win_ij = binary_count[i][j][0]
+            win_ji = binary_count[j][i][0]
+            context[f'method{i + 1}v{j + 1}'] = f"{win_ij} {win_ji}"
+
     return render(request, 'userstudy/dump.html', context)

@@ -34,6 +34,7 @@ class Vote(models.Model):
     id      = models.AutoField(primary_key=True)
     user    = models.ForeignKey(People)
     order   = models.IntegerField(default=0)
+    swap_display = models.BooleanField(default=False)
     sceneId = models.IntegerField(default=0)
     result  = models.IntegerField(default=0)
     method1 = models.IntegerField(default=0)
