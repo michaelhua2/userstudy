@@ -114,14 +114,12 @@ function check_vote() {
 }
 
 
-function validate_info() {
+function validate_info() {    
+    var colorblind  = $("#colorblind-selector").val();
     
-    var gender  = $("#gender-selector").val();
-    var age     = $("#age-selector").val();
-    var exp     = $("#exp-selector").val();
-    
-    if( gender + age + exp > 3 ) {
+    if (colorblind !== null) {
         $('#info-next-btn').removeAttr('disabled');
+    } else {
+        $('#info-next-btn').attr('disabled', 'disabled');
     }
-
 }

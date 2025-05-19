@@ -12,6 +12,7 @@ class People(models.Model):
     votes       = models.CommaSeparatedIntegerField(max_length=1000)
     valid       = models.IntegerField(default=0)
     comment     = models.TextField(default="")
+    is_colorblind = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "User-%d (%s)" %(self.id, self.st_time)

@@ -17,7 +17,7 @@ num_methods = 8      #gt, ours, baseline
 def index(request):
 
     if( request.method == "POST" ):
-        return redirect('main')
+        return redirect('info')
 
     return render(request, 'userstudy/index.html')
 
@@ -38,12 +38,14 @@ def main(request):
     #total_votes = num_selected_styles * num_selected_contents
     total_votes = 1  # TODO: change this to number of image pairs
 
+    is_colorblind = request.session.get('is_colorblind', False)
 
     if( request.method != "POST" ):
 
         #### first visiting, create user
         user = People()
         user.st_time = timezone.now()
+        user.is_colorblind = is_colorblind
         user.save()
 
         ## create Hash code
@@ -101,8 +103,13 @@ def main(request):
         #content_path = 'data/content/%d.png' %vote.content
 
         ref_path = 'data/%d/%d.jpg' %(0,vote.sceneId)
-        m1_path = 'data/%d/%d.png' %(vote.method1,vote.sceneId)
-        m2_path = 'data/%d/%d.png' %(vote.method2,vote.sceneId)
+        if is_colorblind:
+            m1_path = f'data/{vote.method1}/rgb/{vote.sceneId}.png' 
+            m2_path = f'data/{vote.method2}/rgb/{vote.sceneId}.png'
+        else:
+            m1_path = f'data/{vote.method1}/cvd/{vote.sceneId}.png' 
+            m2_path = f'data/{vote.method2}/cvd/{vote.sceneId}.png'
+        
         # m3_path = 'data/%d/%d.jpg' %(vote.method3,vote.sceneId)
         # m4_path = 'data/%d/%d.jpg' %(vote.method4,vote.sceneId)
         # m5_path = 'data/%d/%d.jpg' %(vote.method5,vote.sceneId)
@@ -226,8 +233,12 @@ def main(request):
             #content_path = 'data/content/%d.png' %vote.content
 
             ref_path = 'data/%d/%d.jpg' %(0,vote.sceneId)
-            m1_path = 'data/%d/%d.png' %(vote.method1,vote.sceneId)
-            m2_path = 'data/%d/%d.png' %(vote.method2,vote.sceneId)
+            if is_colorblind:
+                m1_path = f'data/{vote.method1}/rgb/{vote.sceneId}.png' 
+                m2_path = f'data/{vote.method2}/rgb/{vote.sceneId}.png'
+            else:
+                m1_path = f'data/{vote.method1}/cvd/{vote.sceneId}.png' 
+                m2_path = f'data/{vote.method2}/cvd/{vote.sceneId}.png'
             # m3_path = 'data/%d/%d.jpg' %(vote.method3,vote.sceneId)
             # m4_path = 'data/%d/%d.jpg' %(vote.method4,vote.sceneId)
             # m5_path = 'data/%d/%d.jpg' %(vote.method5,vote.sceneId)
@@ -260,20 +271,25 @@ def main(request):
 
 
 def finish(request):
-
-    context = {}
     return render(request, 'userstudy/finish.html')
 
-
+def info(request):
+    if request.method == 'POST':
+        colorblind = request.POST.get('gender')  # assuming 'gender' field stores that answer
+        request.session['is_colorblind'] = (colorblind == '1')
+        return redirect('main')
+    return render(request, 'userstudy/info.html')
 
 def dump(request):
 
     user_all = People.objects.all().exclude(ed_time = None)
 
-    user_header = ["User ID", "Time", "Code", "Finished Votes"]
+    user_header = ["User ID", "Colorblind", "Time", "Code", "Finished Votes"]
     user_data = []
 
-    vote_header = ["User ID", "SceneId", "Method 1", "Method 2", "Method 3", "Method 4", "Result", "Time"]
+    vote_header = ["User ID", "SceneId", "Method 1", "Method 2", 
+                #    "Method 3", "Method 4", 
+                   "Result", "Time"]
     vote_data = []
 
     ## aggregate vote for each method
@@ -291,7 +307,7 @@ def dump(request):
         votes = Vote.objects.filter(user = user).exclude(result = 0)
         user.finish_votes = len(votes)
 
-        user_data.append([user.id, user.duration, user.code, user.finish_votes])
+        user_data.append([user.id, user.is_colorblind, user.duration, user.code, user.finish_votes])
 
 
         # extract valid votes
