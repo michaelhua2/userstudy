@@ -43,6 +43,7 @@ def main(request):
     compare_methods = [2, 3, 4]
     total_votes = num_scenes * len(compare_methods)
     prompts = json.load(open('userstudy/static/prompts.json', 'r'))
+    nouns = json.load(open('userstudy/static/nouns.json', 'r'))
 
     is_colorblind = request.session.get('is_colorblind', False)
 
@@ -93,7 +94,7 @@ def main(request):
             'm1_path': f'data/{left_method}/{subdir}/{vote.sceneId}_0_.png',
             'm2_path': f'data/{right_method}/{subdir}/{vote.sceneId}_0_.png',
             'left_is_method1': left_is_method1,
-            'prompt': prompts[vote.sceneId],
+            'objects': nouns[vote.sceneId]['red'],
         }
 
         vote.st_time = timezone.now()
@@ -165,7 +166,7 @@ def main(request):
             'm1_path': f'data/{left_method}/{subdir}/{vote.sceneId}_0_.png',
             'm2_path': f'data/{right_method}/{subdir}/{vote.sceneId}_0_.png',
             'left_is_method1': left_is_method1,
-            'prompt': prompts[vote.sceneId],
+            'objects': nouns[vote.sceneId]['red'],
         }
 
         vote.st_time = timezone.now()
