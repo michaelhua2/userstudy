@@ -38,7 +38,8 @@ def info(request):
 def main(request):
 
     ########## config ##########
-    num_scenes = 50
+    num_scenes = 25
+    start_scene_id = 25
     base_method = 1
     compare_methods = [2, 3, 4]
     total_votes = num_scenes * len(compare_methods)
@@ -64,7 +65,7 @@ def main(request):
             for m2 in compare_methods:
                 vote = Vote()
                 vote.user = user
-                vote.sceneId = scene_id
+                vote.sceneId = scene_id + start_scene_id
                 vote.method1 = base_method
                 vote.method2 = m2
                 vote.order = 0
