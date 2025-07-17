@@ -8,7 +8,7 @@ import random
 from hashids import Hashids
 from userstudy.utils import CommaString_to_IntArray, IntArray_to_CommaString, choose_imgs, save_csv, load_csv
 from django import template
-import pdb, json
+import json
 
 VERSION = '20170728_style'
 num_methods = 2      #ours, sd, dalton, jiabin
@@ -39,7 +39,7 @@ def main(request):
 
     ########## config ##########
     num_scenes = 25
-    start_scene_id = 25
+    start_scene_id = 0
     base_method = 1
     compare_methods = [2, 3, 4]
     total_votes = num_scenes * len(compare_methods)
@@ -189,6 +189,7 @@ def dump(request):
     num_methods = 4
     count = [0 for _ in range(num_methods)]  # per-method win counts
     binary_count = [[[0, 0] for _ in range(num_methods)] for _ in range(num_methods)]  # [win_count, total]
+    scene_binary_count = [[ [0] * num_methods for _ in range(num_methods) ] for _ in range(50)]
 
     for user in user_all:
         user.duration = (user.ed_time - user.st_time) if user.ed_time else "Not Finish"
@@ -220,6 +221,9 @@ def dump(request):
             # winner wins over loser
             binary_count[winner - 1][loser - 1][0] += 1
 
+            # per scene win counts
+            scene_binary_count[vote.sceneId][winner - 1][loser - 1] += 1
+
     # CSV output
     save_csv('user.csv', user_header, user_data)
     save_csv('vote.csv', vote_header, vote_data)
@@ -244,5 +248,14 @@ def dump(request):
             win_ij = binary_count[i][j][0]
             win_ji = binary_count[j][i][0]
             context[f'method{i + 1}v{j + 1}'] = f"{win_ij} {win_ji}"
+
+    scene_context = []
+    for scene_id in range(50):
+        scene_info = {}
+        for i in range(num_methods):
+            for j in range(i + 1, num_methods):
+                scene_info[f'method{i + 1}v{j + 1}'] = f"{scene_binary_count[scene_id][i][j]} {scene_binary_count[scene_id][j][i]}"
+        scene_context.append(scene_info)
+    context['scene_all'] = scene_context
 
     return render(request, 'userstudy/dump.html', context)

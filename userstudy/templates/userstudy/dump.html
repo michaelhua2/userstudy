@@ -55,6 +55,29 @@
     <table class="table table-bordered">
       <thead>
         <tr>
+          <th>Per Scene Comparison</th>
+          <th>Win Counts {{Method_1}} vs {{Method_2}}</th>
+          <th>Win Counts {{Method_1}} vs {{Method_3}}</th>
+          <th>Win Counts {{Method_1}} vs {{Method_4}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for scene in scene_all %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{scene.method1v2}}</td>
+            <td>{{scene.method1v3}}</td>
+            <td>{{scene.method1v4}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>    
+  </div>
+
+  <div class="row">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
           <th>#</th>
           <th>User ID</th>
           <th>Colorblind</th>
