@@ -35,9 +35,6 @@ def index(request):
     return render(request, 'userstudy/index.html')
 
 def main(request):
-    return render(request, 'userstudy/main.html')
-
-def main(request):
 
     ########## config ##########
     num_scenes = 3
