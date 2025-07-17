@@ -8,13 +8,12 @@ import random
 from hashids import Hashids
 from userstudy.utils import CommaString_to_IntArray, IntArray_to_CommaString, choose_imgs, save_csv, load_csv
 from django import template
-import json
+import json, random
 
 VERSION = '20170728_style'
 num_methods = 2      #ours, sd, dalton, jiabin
 
 # Create your views here.
-
 
 index_to_method = {1: 'ours', 2: 'unguided', 3: 'dalton', 4: 'jiabin'}
 
@@ -23,22 +22,25 @@ def consent(request):
         return redirect('index')
     return render(request, 'userstudy/consent.html')
 
-def index(request):
-    if( request.method == "POST" ):
-        return redirect('info')
-    return render(request, 'userstudy/consent.html')
-
 def info(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         colorblind = request.POST.get('colorblind')
         request.session['is_colorblind'] = (colorblind == '1')
         return redirect('main')
     return render(request, 'userstudy/info.html')
 
+def index(request):
+    if request.method == "POST":
+        return redirect('info')
+    return render(request, 'userstudy/index.html')
+
+def main(request):
+    return render(request, 'userstudy/main.html')
+
 def main(request):
 
     ########## config ##########
-    num_scenes = 25
+    num_scenes = 3
     start_scene_id = 0
     base_method = 1
     compare_methods = [2, 3, 4]
@@ -61,7 +63,8 @@ def main(request):
         user.save()
 
         vote_list = []
-        for scene_id in range(num_scenes):
+        scene_list = random.sample(range(50), num_scenes)
+        for scene_id in scene_list:
             for m2 in compare_methods:
                 vote = Vote()
                 vote.user = user
